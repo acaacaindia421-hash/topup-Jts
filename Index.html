@@ -1,0 +1,293 @@
+<!doctype html>
+
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Top-Up Service — Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Small custom styles */
+    .glass { background: rgba(255,255,255,0.06); backdrop-filter: blur(6px); }
+  </style>
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR-ADSENSE-CLIENT-ID" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gradient-to-br from-slate-900 to-sky-900 min-h-screen text-white">
+  <header class="max-w-6xl mx-auto p-6 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center"> 
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z"/></svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-semibold">TopUpID — Demo</h1>
+        <p class="text-xs text-white/60">Cepat. Aman. Otomatis.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <button id="open-cart" class="bg-white/8 hover:bg-white/12 px-4 py-2 rounded">Keranjang (<span id="cart-count">0</span>)</button>
+      <a href="#contact" class="hidden md:inline-block bg-emerald-500 text-slate-900 px-4 py-2 rounded font-medium">Hubungi</a>
+    </div>
+  </header>  <main class="max-w-6xl mx-auto p-6">
+    <!-- hero -->
+    <section class="grid md:grid-cols-2 gap-6 items-center mb-8">
+      <div class="glass p-6 rounded-lg">
+        <h2 class="text-3xl font-bold">Top-up Game & Pulsa</h2>
+        <p class="mt-2 text-white/80">Pilih paket, masukkan ID pemain/nomor, bayar — saldo langsung masuk (demo: tidak ada pembayaran nyata).</p>
+        <ul class="mt-4 text-sm space-y-2 text-white/80">
+          <li>• Paket game populer (UC, Diamonds, Gems)</li>
+          <li>• Pulsa & Paket Data</li>
+          <li>• Invoice otomatis & history ringkas</li>
+        </ul>
+      </div>
+      <div class="p-6 rounded-lg bg-white/4">
+        <form id="quick-topup" class="space-y-4">
+          <label class="block text-sm">Pilih Layanan</label>
+          <select id="service" class="w-full p-3 rounded bg-white/6">
+            <option value="game_uc">Game - UC (PUBG Mobile)</option>
+            <option value="game_diamond">Game - Diamonds (Mobile Legends)</option>
+            <option value="pulsa">Pulsa - Telkomsel</option>
+          </select><label class="block text-sm">Masukkan ID Player / Nomor</label>
+      <input id="player-id" class="w-full p-3 rounded bg-white/6" placeholder="Contoh: 123456789" required />
+
+      <label class="block text-sm">Paket</label>
+      <select id="paket-select" class="w-full p-3 rounded bg-white/6"></select>
+
+      <div class="flex gap-2">
+        <button type="button" id="add-to-cart" class="flex-1 bg-sky-500 hover:bg-sky-600 py-3 rounded font-medium">Tambahkan ke Keranjang</button>
+        <button type="submit" class="flex-1 bg-emerald-500 hover:bg-emerald-600 py-3 rounded font-medium">Bayar Sekarang</button>
+      </div>
+      <p class="text-xs text-white/60 mt-2">Catatan: Ini demo front-end. Pembayaran hanya simulasi.</p>
+    </form>
+  </div>
+</section>
+
+<!-- product grid -->
+<section class="mb-10">
+  <h3 class="text-2xl font-semibold mb-4">Paket Populer</h3>
+  <div id="products" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- invoice / history -->
+<section class="mb-10">
+  <h3 class="text-2xl font-semibold mb-4">Riwayat (Sesi Ini)</h3>
+  <div id="history" class="space-y-2 text-sm text-white/80">Belum ada transaksi.</div>
+</section>
+
+<section id="contact" class="mb-24 glass p-6 rounded-lg">
+  <h3 class="text-xl font-semibold">Kontak & Informasi</h3>
+  <p class="text-sm text-white/80 mt-2">Untuk integrasi pembayaran nyata, Anda membutuhkan backend & integrasi gateway (Midtrans, Xendit, atau transfer bank). Demo ini menyediakan CSV invoice yang dapat diunduh.</p>
+</section>
+
+  </main>  <footer class="text-center py-6 text-white/70">© TopUpID Demo • Tidak untuk penggunaan komersial</footer>  <!-- CART MODAL -->  <div id="cart-modal" class="fixed inset-0 bg-black/60 hidden items-end md:items-center justify-center z-50">
+    <div class="bg-slate-900 rounded-t-xl md:rounded-xl w-full md:w-3/4 max-w-2xl p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h4 class="text-lg font-semibold">Keranjang</h4>
+        <button id="close-cart" class="text-white/60">Tutup</button>
+      </div>
+      <div id="cart-list" class="space-y-3 mb-4 text-sm text-white/80">Keranjang kosong.</div>
+      <div class="flex justify-between items-center">
+        <div class="text-sm">Total: <span id="cart-total">Rp0</span></div>
+        <div class="flex gap-2">
+          <button id="clear-cart" class="px-3 py-2 bg-white/6 rounded">Kosongkan</button>
+          <button id="checkout" class="px-3 py-2 bg-emerald-500 rounded">Checkout (Simulasi)</button>
+        </div>
+      </div>
+    </div>
+  </div>  <script>
+    // Sample product definitions
+    const PRODUCTS = [
+      { id: 'uc50', name: 'UC 50 (PUBG)', price: 7000 },
+      { id: 'uc100', name: 'UC 100 (PUBG)', price: 13000 },
+      { id: 'ml20', name: 'Diamond 20 (ML)', price: 5000 },
+      { id: 'ml50', name: 'Diamond 50 (ML)', price: 12000 },
+      { id: 'pulsa5', name: 'Pulsa 5k (Telkomsel)', price: 5000 },
+      { id: 'pulsa10', name: 'Pulsa 10k (Telkomsel)', price: 10000 }
+    ];
+
+    // Utilities
+    const formatRupiah = x => 'Rp' + x.toLocaleString('id-ID');
+
+    // Render products
+    const productsEl = document.getElementById('products');
+    PRODUCTS.forEach(p => {
+      const card = document.createElement('div');
+      card.className = 'p-4 rounded-lg bg-white/6';
+      card.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div>
+            <h4 class="font-semibold">${p.name}</h4>
+            <div class="text-sm text-white/80 mt-2">${formatRupiah(p.price)}</div>
+          </div>
+          <div class="flex flex-col items-end gap-2">
+            <button data-id="${p.id}" class="add-btn px-3 py-2 rounded bg-sky-500">Tambah</button>
+            <button data-id="${p.id}" class="buy-now px-3 py-2 rounded bg-emerald-500 text-sm">Beli</button>
+          </div>
+        </div>
+      `;
+      productsEl.appendChild(card);
+    });
+
+    // Paket select population
+    const paketSelect = document.getElementById('paket-select');
+    PRODUCTS.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p.id; opt.textContent = `${p.name} — ${formatRupiah(p.price)}`;
+      paketSelect.appendChild(opt);
+    });
+
+    // Cart state
+    let CART = [];
+
+    const cartCountEl = document.getElementById('cart-count');
+    const cartListEl = document.getElementById('cart-list');
+    const cartTotalEl = document.getElementById('cart-total');
+    const historyEl = document.getElementById('history');
+
+    function updateCartUI(){
+      cartCountEl.textContent = CART.length;
+      if(CART.length===0){ cartListEl.innerHTML='Keranjang kosong.'; cartTotalEl.textContent='Rp0'; return; }
+      cartListEl.innerHTML='';
+      let total=0;
+      CART.forEach((it, idx) => {
+        total += it.price;
+        const row = document.createElement('div');
+        row.className='flex justify-between items-center';
+        row.innerHTML = `<div>${it.name} <span class="text-xs text-white/60">(${it.target})</span></div><div><span class="mr-2">${formatRupiah(it.price)}</span><button data-idx="${idx}" class="remove text-sm bg-white/6 px-2 py-1 rounded">Hapus</button></div>`;
+        cartListEl.appendChild(row);
+      });
+      cartTotalEl.textContent = formatRupiah(total);
+    }
+
+    // Add events for add/buy
+    document.querySelectorAll('.add-btn').forEach(b => b.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.id;
+      addProductToCart(id, prompt('Masukkan ID player / nomor untuk paket ini (contoh: 123456)') || 'unknown');
+    }));
+
+    document.querySelectorAll('.buy-now').forEach(b => b.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.id;
+      const target = prompt('Masukkan ID player / nomor untuk paket ini (contoh: 123456)') || 'unknown';
+      const product = PRODUCTS.find(x=>x.id===id);
+      if(confirm(`Beli ${product.name} seharga ${formatRupiah(product.price)} untuk ${target}? (Simulasi)`)){
+        processCheckout([ { ...product, target } ]);
+      }
+    }));
+
+    // Form actions
+    document.getElementById('add-to-cart').addEventListener('click', ()=>{
+      const id = paketSelect.value; const target = document.getElementById('player-id').value || 'unknown';
+      addProductToCart(id, target);
+    });
+
+    document.getElementById('quick-topup').addEventListener('submit', e=>{
+      e.preventDefault();
+      const id = paketSelect.value; const target = document.getElementById('player-id').value || 'unknown';
+      const product = PRODUCTS.find(x=>x.id===id);
+      if(!product){ alert('Pilih paket yang valid'); return; }
+      if(!target){ alert('Masukkan ID/nomor'); return; }
+      if(confirm(`Lanjutkan pembayaran ${product.name} untuk ${target}? (Simulasi)`)){
+        processCheckout([ { ...product, target } ]);
+      }
+    });
+
+    function addProductToCart(prodId, target){
+      const product = PRODUCTS.find(x=>x.id===prodId);
+      if(!product) return alert('Paket tidak ditemukan');
+      CART.push({ ...product, target });
+      updateCartUI();
+      openCart();
+    }
+
+    // Cart modal controls
+    const cartModal = document.getElementById('cart-modal');
+    document.getElementById('open-cart').addEventListener('click', openCart);
+    document.getElementById('close-cart').addEventListener('click', closeCart);
+    document.getElementById('clear-cart').addEventListener('click', ()=>{ CART=[]; updateCartUI(); });
+
+    function openCart(){ cartModal.classList.remove('hidden'); cartModal.classList.add('flex'); updateCartUI(); }
+    function closeCart(){ cartModal.classList.add('hidden'); cartModal.classList.remove('flex'); }
+
+    // remove item
+    cartListEl.addEventListener('click', e=>{
+      if(e.target.matches('.remove')){
+        const idx = Number(e.target.dataset.idx);
+        CART.splice(idx,1); updateCartUI();
+      }
+    });
+
+    // Checkout (simulate)
+    document.getElementById('checkout').addEventListener('click', ()=>{
+      if(CART.length===0) return alert('Keranjang kosong');
+      if(confirm('Lanjutkan checkout untuk semua item? (Simulasi)')){
+        processCheckout(CART.slice());
+        CART = [];
+        updateCartUI();
+        closeCart();
+      }
+    });
+
+    // Process checkout: simulate processing and create invoice entry
+    function processCheckout(items){
+      // simulate processing delay
+      const total = items.reduce((s,i)=>s+i.price, 0);
+      const invoice = {
+        id: 'INV' + Date.now(),
+        items,
+        total,
+        date: new Date().toLocaleString('id-ID')
+      };
+
+      // show success
+      alert('Pembayaran berhasil (Simulasi) — Invoice: ' + invoice.id);
+
+      // append to history
+      appendHistory(invoice);
+
+      // offer download invoice
+      const data = `Invoice: ${invoice.id}\nTanggal: ${invoice.date}\nTotal: ${formatRupiah(invoice.total)}\nItems:\n` + invoice.items.map(i=>` - ${i.name} untuk ${i.target} : ${formatRupiah(i.price)}`).join('\n');
+      const blob = new Blob([data], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = invoice.id + '.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function appendHistory(inv){
+      const el = document.createElement('div');
+      el.className='p-3 rounded bg-white/4';
+      el.innerHTML = `<div class="flex justify-between items-start">
+        <div>
+          <div class="font-medium">${inv.id}</div>
+          <div class="text-xs text-white/70">${inv.date}</div>
+          <div class="text-sm mt-2">${inv.items.map(i=>`${i.name} → ${i.target}`).join('<br/>')}</div>
+        </div>
+        <div class="text-right">
+          <div class="font-semibold">${formatRupiah(inv.total)}</div>
+        </div>
+      </div>`;
+      historyEl.prepend(el);
+    }
+
+    // initial render
+    updateCartUI();
+  </script>  <!-- ADS SECTION -->  <!-- Slot Iklan AdSense (Banner) --><ins class="adsbygoogle"
+style="display:block; text-align:center; margin:20px auto;"
+data-ad-client="YOUR-ADSENSE-CLIENT-ID"
+data-ad-slot="YOUR-AD-SLOT-ID"
+data-ad-format="auto"
+data-full-width-responsive="true"></ins>
+
+  <script>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>  <script>
+    // Contoh placeholder iklan — ganti dengan kode AdSense / banner lain
+    document.addEventListener('DOMContentLoaded', () => {
+      const ad = document.createElement('div');
+      ad.className = 'fixed bottom-3 right-3 bg-white/10 backdrop-blur p-4 rounded-lg border border-white/10 text-sm';
+      ad.innerHTML = '<b>Iklan:</b> Tempat iklan Anda di sini. (Ganti dengan kode AdSense)';
+      document.body.appendChild(ad);
+    });
+  </script></body>
+          </html>
